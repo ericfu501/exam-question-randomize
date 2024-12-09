@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,  initial-scale=1.0">
+  <title>抽题机 (^_^)</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    h2 {
+      text-align: center;
+      font-family: 'Impact',  sans-serif;
+      color: #f39c12;
+      font-size: 36px;
+      margin: 20px 0;
+    }
+
+    h3 {
+      font-family: 'Impact',  sans-serif;
+      color: #f39c12;
+      font-size: 28px;
+      margin: 0 0 90px 0;
+    }
+
+    #timer {
+      font-size: 30px;
+      margin-bottom: 30px;
+      font-family: 'Helvetica Neue',  sans-serif;
+      color: #4CAF50;
+    }
+    
+    .text-wrapper {
+        margin-top: 30px;
+        height: 110px;
+    }
+
+    .q-text {
+        font-size: 30px;
+        font-family: 'Impact',  sans-serif;
+        color: darkslateblue;
+    }
+
+    button {
+      padding: 15px 30px;
+      margin: 5px;
+      font-size: 20px;
+      background-color: grey;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transition: none;
+    }
+
+    #stopBtn {
+        background-color: crimson;
+    }
+    #stopBtn:hover {
+        background-color: lightcoral;
+    }
+
+    #startBtn {
+        background-color: #3498db;
+    }
+    #startBtn:hover {
+        background-color: lightskyblue;
+    }
+    #resetBtn:hover {
+      background-color: darkgrey;
+    }
+
+    .btn-wrapper {
+        margin-top: 110px;
+        height: 40px;
+    }
+
+    .desc {
+        font-family: 'Helvetica Neue',  sans-serif;
+        font-size: 21px;
+        color: gray;
+    }
+
+    .outer-box {
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 120px 30px 120px;
+        height: 300px;
+        margin-top: 8px;
+    }
+    .norm-text {
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+  </style>
+  <!-- 添加讯飞WebAPI SDK -->
+  <script src="https://webapi.xfyun.cn/v1/aiui/js/websocket_base64.js"></script>
+  <script src="https://webapi.xfyun.cn/v1/aiui/js/pcm-player.js"></script>
+  <script src="https://webapi.xfyun.cn/v1/aiui/js/WebIAT.js"></script>
+</head>
+
+<body>
+  <h2>抽题机 (^_^)</h2>
+  <audio id="countdownAudio" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+  </audio>
+  <h3>熟谱视唱</h3>
+  <div class="desc">要求：给开始音，打节拍图示，自己起速度，只唱一遍。</div>
+  <div class="outer-box">
+    <div><span class="norm-text">倒计时：</span><span id="timer">10.00s</span></div>
+    <div class="text-wrapper">
+        <span class="norm-text">你的题目是：</span>
+        <span class="q-text" id="group">--</span>
+        <span class="q-text" id="question">--</span>
+    </div>
+    <div class="btn-wrapper">
+        <button id="resetBtn">重置</button>
+        <button id="startBtn">开始</button>
+        <button id="stopBtn">停！</button>
+    </div>
+  </div>
+
+  <div class="desc" style="margin-top: 20px; font-size: 16px; color: #666;">
+    提示：说"停！"可以停止倒计时！
+  </div>
+
+  <script>
+    const INIT_COUNT_DOWN = 10.00;
+    const ALL_GROUPS = ['单', '1B'];
+    const ALL_QUESITONS = {
+        '单': [39, 40, 43, 47, 48, 49, 51, 52, 53, 54, 55, 56, 58, 62, 63, 64, 67, 69, 74, 77, 79, 80, 83, 84, 85, 89, 93, 100, 102, 103, 104, 108, 110, 111, 113, 114, 115, 116, 117, 120, 121, 122, 123], 
+        '1B': [35, 36, 10, 41, 42, 43, 45, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66, 71, '71bis', 74, 76, 81, 86, 89, 90, 92, 93, 95, 96]
+    };
+
+    let timer = INIT_COUNT_DOWN;
+    let interval;
+    let groups = JSON.parse(JSON.stringify(ALL_GROUPS));
+    let questions = JSON.parse(JSON.stringify(ALL_QUESITONS));
+    let gIndex = 0;
+    let qIndex = 0;
+
+    const timerElement = document.getElementById('timer');
+    const groupElement = document.getElementById('group');
+    const questionElement = document.getElementById('question');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    stopBtn.disabled = true;
+
+    // 替换原有的语音识别初始化代码
+    let xfRecognition;
+
+    function initSpeechRecognition() {
+        try {
+            // 检查SDK是否正确加载
+            if (typeof WebIAT === 'undefined') {
+                throw new Error('讯飞SDK未能正确加载，请检查网络连接');
+            }
+
+            // 配置讯飞语音识别
+            const config = {
+                // 使用您的讯飞开放平台应用凭证
+                "appid": "4da6c04e",
+                "api_key": "d5d0e4e16e49e9750206c787d974146b",
+                "api_secret": "ZTYxN2Y4ZDNmNjM0ZWY2YzUxZTdkYTMw",
+                // 设置参数
+                "accent": "mandarin", // 设置为普通话
+                "sample_rate": "16000", // 采样率16k
+                "vad_eos": "1000", // 后端点检测时间1秒
+                "enable_punctuation": true, // 开启标点符号
+                "enable_intermediate_result": true, // 开启中间结果返回
+                "language": "zh_cn" // 设置语言为中文
+            };
+
+            xfRecognition = new WebIAT(config);
+
+            // 添加连接状态监听
+            xfRecognition.onOpen = function() {
+                console.log('语音识别连接已建立');
+            };
+
+            xfRecognition.onClose = function() {
+                console.log('语音识别连接已关闭');
+            };
+
+            // 监听识别结果
+            xfRecognition.onResult = function(result) {
+                try {
+                    if (result && result.data) {
+                        // 解析JSON结果
+                        const resultData = JSON.parse(result.data);
+                        if (resultData.result) {
+                            const transcript = resultData.result.text;
+                            console.log('识别到的语音:', transcript);
+                            
+                            // 检查是否包含"停"字
+                            if (transcript.includes('停')) {
+                                console.log('检测到停止命令');
+                                stopBtn.click();
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('解析识别结果时出错:', error);
+                }
+            };
+
+            // 监听错误
+            xfRecognition.onError = function(error) {
+                console.error('语音识别错误:', error);
+                // 发生错误时尝试重新初始化
+                setTimeout(initSpeechRecognition, 3000);
+            };
+
+            console.log('语音识别初始化成功');
+        } catch (error) {
+            console.error('初始化语音识别时发生错误:', error);
+        }
+    }
+
+    // 初始化语音识别
+    initSpeechRecognition();
+
+    function reportLeftNumber() {
+        console.log('现在剩多少条问题？', '单: ', questions['单'].length, '1B: ', questions['1B'].length)
+    }
+
+    // 添加音频元素引
+    const countdownAudio = document.getElementById('countdownAudio');
+    
+    // 添加音频状态控制
+    let isPlaying = false;
+    
+    // 修改音频控制函数
+    async function playAudio() {
+        if (isPlaying) return;
+        
+        try {
+            countdownAudio.currentTime = 0;
+            isPlaying = true;
+            await countdownAudio.play();
+        } catch (error) {
+            console.log("播放音频出错:", error);
+            isPlaying = false;
+        }
+    }
+
+    async function stopAudio() {
+        if (!isPlaying) return;
+        
+        try {
+            await new Promise(resolve => setTimeout(resolve, 100)); // 添加小延迟
+            countdownAudio.pause();
+            isPlaying = false;
+        } catch (error) {
+            console.log("停止音频出错:", error);
+        }
+    }
+    
+    startBtn.addEventListener('click', async () => {
+      if (timer && timer < INIT_COUNT_DOWN) return;
+      
+      reportLeftNumber();
+      stopBtn.disabled = false;
+      
+      // 启动讯飞语音识别
+      if (xfRecognition) {
+          try {
+              await xfRecognition.start();
+              console.log('语音识别已启动');
+          } catch (error) {
+              console.error('启动语音识别失败:', error);
+              // 如果启动失败，尝试重新初始化
+              initSpeechRecognition();
+          }
+      } else {
+          console.warn('语音识别未初始化，正在重新初始化...');
+          initSpeechRecognition();
+      }
+
+      await playAudio();
+
+      interval = setInterval(() => {
+        timer -= 0.02;
+        timerElement.textContent = timer.toFixed(2) + 's';
+        gIndex = Math.floor(Math.random(0, 1) * 2);
+        qIndex = Math.floor(Math.random(0, questions[groups[gIndex]].length) * questions[groups[gIndex]].length);
+        groupElement.textContent = groups[gIndex];
+        questionElement.textContent = questions[groups[gIndex]][qIndex];
+        if (timer <= 0) {
+          clearInterval(interval);
+          timerElement.textContent = 0.00.toFixed(2) + 's';
+          startBtn.disabled = true;
+          stopBtn.disabled = true;
+          stopAudio();
+        }
+      }, 20);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      clearInterval(interval);
+      
+      // 停止讯飞语音识别
+      if (xfRecognition) {
+          try {
+              xfRecognition.stop();
+              console.log('语音识别已停止');
+          } catch (error) {
+              console.error('停止语音识别失败:', error);
+          }
+      }
+
+      // 停止音乐
+      stopAudio();
+      
+      timer = INIT_COUNT_DOWN;
+      timerElement.textContent = timer.toFixed(2) + 's';
+      groupElement.textContent = '--';
+      questionElement.textContent = '--';
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+
+    stopBtn.addEventListener('click', () => {
+      clearInterval(interval);
+
+      // 停止讯飞语音识别
+      if (xfRecognition) {
+          xfRecognition.stop();
+      }
+
+      // 停止音乐
+      stopAudio();
+
+      // 保证题目只能用一次，题目用完了，就把这个组删掉
+      questions[groups[gIndex]].splice(qIndex, 1);
+      if (questions[groups[gIndex]].length === 0) {
+          groups.splice(gIndex, 1);
+      }
+
+      timerElement.textContent = timer.toFixed(2) + 's';
+      startBtn.disabled = true;
+    });
+  </script>
+</body>
+
+</html>
