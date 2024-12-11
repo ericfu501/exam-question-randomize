@@ -5,93 +5,132 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,  initial-scale=1.0">
-  <title>抽题机 (^_^)</title>
+  <title>抽题机加强版 (^_^)</title>
   <style>
+    :root {
+        --primary-color: #6C63FF;
+        --secondary-color: #4CAF50;
+        --text-color: #2C3E50;
+        --background-color: #F8F9FA;
+        --accent-color: #FF6B6B;
+        --shadow-color: rgba(0, 0, 0, 0.1);
+        --glow-color: rgba(108, 99, 255, 0.2);
+    }
+
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: var(--background-color);
+        font-family: 'Helvetica Neue', sans-serif;
+        margin: 0;
+        padding: 20px;
+        color: var(--text-color);
+        transition: all 0.3s ease;
     }
 
     h2 {
-      text-align: center;
-      font-family: 'Impact',  sans-serif;
-      color: #f39c12;
-      font-size: 36px;
-      margin: 20px 0;
+        text-align: center;
+        font-family: 'Helvetica Neue', sans-serif;
+        color: var(--primary-color);
+        font-size: 36px;
+        margin: 10px 0;
+        font-weight: 600;
+        letter-spacing: 2px;
     }
 
     h3 {
-      font-family: 'Impact',  sans-serif;
-      color: #f39c12;
-      font-size: 28px;
-      margin: 0 0 90px 0;
+        font-family: 'Helvetica Neue', sans-serif;
+        color: var(--primary-color);
+        font-size: 28px;
+        margin: 0 0 60px 0;
+        font-weight: 500;
     }
 
     #timer {
-      font-size: 30px;
-      margin-bottom: 30px;
-      font-family: 'Helvetica Neue',  sans-serif;
-      color: #4CAF50;
+        font-size: 30px;
+        margin-bottom: 30px;
+        font-family: 'Helvetica Neue',  sans-serif;
+        color: var(--secondary-color);
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
     }
     
     .text-wrapper {
-        margin-top: 30px;
-        height: 110px;
+        margin-top: 0;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     .q-text {
         font-size: 30px;
-        font-family: 'Impact',  sans-serif;
-        color: darkslateblue;
+        font-family: 'Helvetica Neue', sans-serif;
+        color: var(--primary-color);
+        font-weight: 600;
     }
 
     button {
-      padding: 15px 30px;
-      margin: 5px;
-      font-size: 20px;
-      background-color: grey;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+        padding: 16px 32px;
+        margin: 5px;
+        font-size: 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px var(--shadow-color);
+        line-height: 1;
+        min-width: 100px;
+        align-self: center;
     }
 
     button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transition: none;
+        opacity: 0.5;
+        cursor: not-allowed;
+        transition: none;
     }
 
     #stopBtn {
-        background-color: crimson;
+        background-color: var(--accent-color);
     }
     #stopBtn:hover {
-        background-color: lightcoral;
+        background-color: #ff8585;
+        transform: translateY(-2px);
     }
 
     #startBtn {
-        background-color: #3498db;
+        background-color: var(--secondary-color);
     }
     #startBtn:hover {
-        background-color: lightskyblue;
+        background-color: #5dc561;
+        transform: translateY(-2px);
     }
     #resetBtn:hover {
-      background-color: darkgrey;
+        background-color: #7d75ff;
+        transform: translateY(-2px);
     }
 
     .btn-wrapper {
-        margin-top: 110px;
-        height: 40px;
+        margin-top: 80px;
+        height: 45px;
+        display: flex;
+        gap: 15px;
     }
 
     .desc {
         font-family: 'Helvetica Neue',  sans-serif;
         font-size: 21px;
-        color: gray;
+        color: var(--text-color);
+        opacity: 0.8;
+        text-align: center;
+        max-width: 600px;
+        line-height: 1.6;
     }
 
     .outer-box {
@@ -100,13 +139,117 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 60px 120px 30px 120px;
-        height: 300px;
+        padding: 80px 120px 60px 120px;
+        height: 340px;
         margin-top: 8px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px var(--shadow-color);
+        transition: all 0.3s ease;
     }
     .norm-text {
         font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     }
+
+    .mode-hint {
+        color: var(--primary-color);
+        font-size: 24px;
+        font-weight: 500;
+        margin: 15px 0;
+        text-align: center;
+        min-height: 36px;
+    }
+
+    .result-display {
+        margin: 15px 0;
+        font-size: 20px;
+        color: var(--text-color);
+        min-height: 50px;
+        text-align: center;
+    }
+
+    .result-display div {
+        margin: 12px 0;
+        line-height: 1.4;
+        padding: 10px;
+        background: rgba(108, 99, 255, 0.1);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .speech-bubble {
+        position: relative;
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 15px 15px 15px 15px;
+        box-shadow: 0 4px 8px var(--shadow-color);
+        transition: all 0.3s ease;
+        border: 2px solid var(--primary-color);
+    }
+
+    .speech-bubble:after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        right: 20px;
+        width: 0;
+        height: 0;
+        border: 10px solid transparent;
+        border-top-color: var(--primary-color);
+        border-bottom: 0;
+        margin-right: 0;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes backgroundPulse {
+        0% { background-color: var(--background-color); }
+        50% { background-color: var(--glow-color); }
+        100% { background-color: var(--background-color); }
+    }
+
+    @keyframes timerPulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); color: #FF6B6B; }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes textGlow {
+        0% { text-shadow: 0 0 5px var(--primary-color); }
+        50% { text-shadow: 0 0 20px var(--primary-color); }
+        100% { text-shadow: 0 0 5px var(--primary-color); }
+    }
+
+    @keyframes boxShadowPulse {
+        0% { box-shadow: 0 10px 20px var(--shadow-color); }
+        50% { box-shadow: 0 15px 30px var(--glow-color); }
+        100% { box-shadow: 0 10px 20px var(--shadow-color); }
+    }
+
+    .countdown-active {
+        animation: backgroundPulse 2s infinite;
+    }
+
+    .timer-active {
+        animation: timerPulse 1s infinite;
+        transform-origin: center;
+    }
+
+    .text-active {
+        animation: textGlow 2s infinite;
+    }
+
+    .box-active {
+        animation: boxShadowPulse 2s infinite;
+    }
+
   </style>
   <!-- 添加讯飞WebAPI SDK -->
   <script src="https://webapi.xfyun.cn/v1/aiui/js/websocket_base64.js"></script>
@@ -115,18 +258,25 @@
 </head>
 
 <body>
-  <h2>抽题机 (^_^)</h2>
+  <h2>抽题机加强版 (⌐■_■)</h2>
   <audio id="countdownAudio" loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <source src="countdown.mp3" type="audio/mpeg">
   </audio>
   <h3>熟谱视唱</h3>
   <div class="desc">要求：给开始音，打节拍图示，自己起速度，只唱一遍。</div>
   <div class="outer-box">
+    <div class="speech-bubble" style="position: fixed; left: 18%; top: 45%; transform: translatdeY(-50%);">
+        <div id="mode-hint" class="mode-hint">请先抽单声部题目</div>
+    </div>
     <div><span class="norm-text">倒计时：</span><span id="timer">10.00s</span></div>
     <div class="text-wrapper">
         <span class="norm-text">你的题目是：</span>
         <span class="q-text" id="group">--</span>
         <span class="q-text" id="question">--</span>
+    </div>
+    <div id="result-display" class="result-display">
+        <div id="single-result"></div>
+        <div id="multiple-result"></div>
     </div>
     <div class="btn-wrapper">
         <button id="resetBtn">重置</button>
@@ -135,21 +285,23 @@
     </div>
   </div>
 
-  <div class="desc" style="margin-top: 20px; font-size: 16px; color: #666;">
-    提示：说"停！"可以停止倒计时！
+  <div class="desc" style="margin-top: 60px; font-size: 16px; color: #666;">
+    ( 提示：朝我喊" 停！"可以停止倒计时！)
   </div>
 
   <script>
     const INIT_COUNT_DOWN = 10.00;
-    const ALL_GROUPS = ['单', '1B'];
+    const ALL_GROUPS_SINGLE = ['单', '1B'];
+    const ALL_GROUPS_MULTIPLE = ['多', '斯'];
     const ALL_QUESITONS = {
-        '单': [39, 40, 43, 47, 48, 49, 51, 52, 53, 54, 55, 56, 58, 62, 63, 64, 67, 69, 74, 77, 79, 80, 83, 84, 85, 89, 93, 100, 102, 103, 104, 108, 110, 111, 113, 114, 115, 116, 117, 120, 121, 122, 123], 
-        '1B': [35, 36, 10, 41, 42, 43, 45, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 61, 62, 63, 64, 65, 66, 71, '71bis', 74, 76, 81, 86, 89, 90, 92, 93, 95, 96]
+        '单': [132, 135, 147, 150, 137, 144, 151, 155, 159, 163, 167, 170, 173, 187, 189, 198, 207, 208, 209, 222, 223, 235, 241, 248, 253, 284, 286, 292, 291, 296, 300, 301], 
+        '1B': [98, 99, 100, 101, 102, 107, 110, 134, 135, 137, 139, 141, 142],
+        '多': [1, 7, 8, 9, 82, 84, 14, 17, 22, 90, 26, 32, 85, 91],
+        '斯': [1, 2, 3, 4, 6, 7, 9, 10, 24, 37, 15, 25]
     };
 
     let timer = INIT_COUNT_DOWN;
     let interval;
-    let groups = JSON.parse(JSON.stringify(ALL_GROUPS));
     let questions = JSON.parse(JSON.stringify(ALL_QUESITONS));
     let gIndex = 0;
     let qIndex = 0;
@@ -180,7 +332,7 @@
                 "api_key": "d5d0e4e16e49e9750206c787d974146b",
                 "api_secret": "ZTYxN2Y4ZDNmNjM0ZWY2YzUxZTdkYTMw",
                 // 设置参数
-                "accent": "mandarin", // 设置为普通话
+                "accent": "mandarin", // 设置普通话
                 "sample_rate": "16000", // 采样率16k
                 "vad_eos": "1000", // 后端点检测时间1秒
                 "enable_punctuation": true, // 开启标点符号
@@ -192,7 +344,7 @@
 
             // 添加连接状态监听
             xfRecognition.onOpen = function() {
-                console.log('语音识别连接已建立');
+                console.log('语音识别连接已立');
             };
 
             xfRecognition.onClose = function() {
@@ -224,7 +376,7 @@
             // 监听错误
             xfRecognition.onError = function(error) {
                 console.error('语音识别错误:', error);
-                // 发生错误时尝试重新初始化
+                // 发错时尝试重新初始化
                 setTimeout(initSpeechRecognition, 3000);
             };
 
@@ -238,7 +390,12 @@
     initSpeechRecognition();
 
     function reportLeftNumber() {
-        console.log('现在剩多少条问题？', '单: ', questions['单'].length, '1B: ', questions['1B'].length)
+        console.log('现在剩多少条问题？', 
+            '单声部 - 单: ', questions['单'].length, 
+            '1B: ', questions['1B'].length,
+            '多声部 - 多: ', questions['多'].length,
+            '斯: ', questions['斯'].length
+        );
     }
 
     // 添加音频元素引
@@ -252,7 +409,7 @@
         if (isPlaying) return;
         
         try {
-            countdownAudio.currentTime = 0;
+            // countdownAudio.currentTime = 0;
             isPlaying = true;
             await countdownAudio.play();
         } catch (error) {
@@ -273,89 +430,196 @@
         }
     }
     
+    // 添加一个状态变量来跟踪当前是单声部还是多声部
+    let currentMode = 'single'; // 'single' 或 'multiple'
+
+    // 在 script 标签开始处添加新的状态变量
+    let singlePartQuestion = null; // 用于存储单声部题目
+
+    // 添加新的DOM元素引用
+    const modeHintElement = document.getElementById('mode-hint');
+    const resultDisplay = document.getElementById('result-display');
+    const singleResult = document.getElementById('single-result');
+    const multipleResult = document.getElementById('multiple-result');
+
+    // 修改 startBtn 的点击事件处理
     startBtn.addEventListener('click', async () => {
-      if (timer && timer < INIT_COUNT_DOWN) return;
-      
-      reportLeftNumber();
-      stopBtn.disabled = false;
-      
-      // 启动讯飞语音识别
-      if (xfRecognition) {
-          try {
-              await xfRecognition.start();
-              console.log('语音识别已启动');
-          } catch (error) {
-              console.error('启动语音识别失败:', error);
-              // 如果启动失败，尝试重新初始化
-              initSpeechRecognition();
-          }
-      } else {
-          console.warn('语音识别未初始化，正在重新初始化...');
-          initSpeechRecognition();
-      }
+        if (timer && timer < INIT_COUNT_DOWN) return;
 
-      await playAudio();
-
-      interval = setInterval(() => {
-        timer -= 0.02;
-        timerElement.textContent = timer.toFixed(2) + 's';
-        gIndex = Math.floor(Math.random(0, 1) * 2);
-        qIndex = Math.floor(Math.random(0, questions[groups[gIndex]].length) * questions[groups[gIndex]].length);
-        groupElement.textContent = groups[gIndex];
-        questionElement.textContent = questions[groups[gIndex]][qIndex];
-        if (timer <= 0) {
-          clearInterval(interval);
-          timerElement.textContent = 0.00.toFixed(2) + 's';
-          startBtn.disabled = true;
-          stopBtn.disabled = true;
-          stopAudio();
+        console.log('开始抽题: ', countdownAudio.currentTime);
+        
+        reportLeftNumber();
+        stopBtn.disabled = false;
+        
+        // 根据当前模式显示提示
+        if (currentMode === 'single') {
+            modeHintElement.textContent = '请先抽单声部题目';
+            singleResult.textContent = '';
+            multipleResult.textContent = '';
+        } else {
+            modeHintElement.textContent = '接下来，请抽多声部题目';
+            // 重置倒计时
+            timer = INIT_COUNT_DOWN;
+            timerElement.textContent = timer.toFixed(2) + 's';
         }
-      }, 20);
+        
+        // 启动讯飞语音识别
+        if (xfRecognition) {
+            try {
+                await xfRecognition.start();
+                console.log('语音识别已启动');
+            } catch (error) {
+                console.error('启动语音识别失败:', error);
+                initSpeechRecognition();
+            }
+        } else {
+            console.warn('语音识别未初始化，正在重新初始化...');
+            initSpeechRecognition();
+        }
+
+        await playAudio();
+
+        // 添加动画类
+        document.body.classList.add('countdown-active');
+        timerElement.classList.add('timer-active');
+        groupElement.classList.add('text-active');
+        questionElement.classList.add('text-active');
+        document.querySelector('.outer-box').classList.add('box-active');
+
+        interval = setInterval(() => {
+            timer -= 0.02;
+            timerElement.textContent = timer.toFixed(2) + 's';
+            
+            // 根据当前模式选择不同的组别
+            const currentGroups = currentMode === 'single' ? ALL_GROUPS_SINGLE : ALL_GROUPS_MULTIPLE;
+            gIndex = Math.floor(Math.random() * currentGroups.length);
+            const currentGroupName = currentGroups[gIndex];
+            qIndex = Math.floor(Math.random() * questions[currentGroupName].length);
+            
+            groupElement.textContent = currentGroupName;
+            questionElement.textContent = questions[currentGroupName][qIndex];
+            
+            if (timer <= 0) {
+                clearInterval(interval);
+                timerElement.textContent = 0.00.toFixed(2) + 's';
+                startBtn.disabled = true;
+                stopBtn.disabled = true;
+                stopAudio();
+                
+                // 移除动画类
+                document.body.classList.remove('countdown-active');
+                timerElement.classList.remove('timer-active');
+                groupElement.classList.remove('text-active');
+                questionElement.classList.remove('text-active');
+                document.querySelector('.outer-box').classList.remove('box-active');
+            }
+        }, 20);
     });
 
-    resetBtn.addEventListener('click', () => {
-      clearInterval(interval);
-      
-      // 停止讯飞语音识别
-      if (xfRecognition) {
-          try {
-              xfRecognition.stop();
-              console.log('语音识别已停止');
-          } catch (error) {
-              console.error('停止语音识别失败:', error);
-          }
-      }
-
-      // 停止音乐
-      stopAudio();
-      
-      timer = INIT_COUNT_DOWN;
-      timerElement.textContent = timer.toFixed(2) + 's';
-      groupElement.textContent = '--';
-      questionElement.textContent = '--';
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    });
-
+    // 修改 stopBtn 的点击事件处理
     stopBtn.addEventListener('click', () => {
-      clearInterval(interval);
+        clearInterval(interval);
 
-      // 停止讯飞语音识别
-      if (xfRecognition) {
-          xfRecognition.stop();
-      }
+        if (xfRecognition) {
+            xfRecognition.stop();
+        }
 
-      // 停止音乐
-      stopAudio();
+        stopAudio();
 
-      // 保证题目只能用一次，题目用完了，就把这个组删掉
-      questions[groups[gIndex]].splice(qIndex, 1);
-      if (questions[groups[gIndex]].length === 0) {
-          groups.splice(gIndex, 1);
-      }
+        // 获取当前组别
+        const currentGroups = currentMode === 'single' ? ALL_GROUPS_SINGLE : ALL_GROUPS_MULTIPLE;
+        const currentGroupName = currentGroups[gIndex];
 
-      timerElement.textContent = timer.toFixed(2) + 's';
-      startBtn.disabled = true;
+        // 从题库中移除已抽到的题目
+        questions[currentGroupName].splice(qIndex, 1);
+        if (questions[currentGroupName].length === 0) {
+            const groupIndex = currentGroups.indexOf(currentGroupName);
+            if (groupIndex > -1) {
+                currentGroups.splice(groupIndex, 1);
+            }
+        }
+
+        timerElement.textContent = timer.toFixed(2) + 's';
+        
+        // 切换模式
+        if (currentMode === 'single') {
+            // 保存单声部题目
+            singlePartQuestion = {
+                group: groupElement.textContent,
+                question: questionElement.textContent
+            };
+            
+            // 显示单声部题目
+            singleResult.textContent = `你的单声部题目是：${singlePartQuestion.group} ${singlePartQuestion.question}`;
+            singleResult.classList.add('fade-in');
+            modeHintElement.textContent = '接下来，请抽多声部题目';
+            
+            // 切换到多声部模式
+            currentMode = 'multiple';
+            startBtn.disabled = false;
+            console.log('切换到多声部模式');
+            
+            // 重置倒计时和音频
+            timer = INIT_COUNT_DOWN;
+            timerElement.textContent = timer.toFixed(2) + 's';
+
+        } else {
+            // 显示多声部题目
+            multipleResult.textContent = `你的多声部题目是：${groupElement.textContent} ${questionElement.textContent}`;
+            multipleResult.classList.add('fade-in');
+            modeHintElement.textContent = '本轮抽题结束';
+            startBtn.disabled = true;
+            countdownAudio.currentTime = 0; // 确保音频重置到开始位置
+            console.log('本轮抽题结束');
+        }
+
+        // 移除动画类
+        document.body.classList.remove('countdown-active');
+        timerElement.classList.remove('timer-active');
+        groupElement.classList.remove('text-active');
+        questionElement.classList.remove('text-active');
+        document.querySelector('.outer-box').classList.remove('box-active');
+    });
+
+    // 修改 resetBtn 的点击事件处理
+    resetBtn.addEventListener('click', () => {
+        clearInterval(interval);
+        
+        if (xfRecognition) {
+            try {
+                xfRecognition.stop();
+                console.log('语音识别已停止');
+            } catch (error) {
+                console.error('停止语音识别失败:', error);
+            }
+        }
+
+        stopAudio();
+        
+        timer = INIT_COUNT_DOWN;
+        timerElement.textContent = timer.toFixed(2) + 's';
+        groupElement.textContent = '--';
+        questionElement.textContent = '--';
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        currentMode = 'single'; // 重置为单声部模式
+        singlePartQuestion = null; // 重置单声部题目
+        
+        // 重置题库
+        // questions = JSON.parse(JSON.stringify(ALL_QUESITONS));
+        
+        modeHintElement.textContent = '请先抽单声部题目';
+        singleResult.textContent = '';
+        multipleResult.textContent = '';
+        singleResult.classList.remove('fade-in');
+        multipleResult.classList.remove('fade-in');
+
+        // 移除动画类
+        document.body.classList.remove('countdown-active');
+        timerElement.classList.remove('timer-active');
+        groupElement.classList.remove('text-active');
+        questionElement.classList.remove('text-active');
+        document.querySelector('.outer-box').classList.remove('box-active');
     });
   </script>
 </body>
