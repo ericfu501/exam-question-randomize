@@ -7,10 +7,6 @@
   <meta name="viewport" content="width=device-width,  initial-scale=1.0">
   <title>抽题机加强版 (^_^)</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- 添加讯飞WebAPI SDK -->
-  <script src="https://webapi.xfyun.cn/v1/aiui/js/websocket_base64.js"></script>
-  <script src="https://webapi.xfyun.cn/v1/aiui/js/pcm-player.js"></script>
-  <script src="https://webapi.xfyun.cn/v1/aiui/js/WebIAT.js"></script>
 </head>
 
 <body>
@@ -42,10 +38,6 @@
     </div>
   </div>
 
-  <div class="desc" style="margin-top: 60px; font-size: 16px; color: #666;">
-    ( 提示：朝我喊" 停！"可以停止倒计时！)
-  </div>
-
   <script>
     const INIT_COUNT_DOWN = 10.00;
     const ALL_GROUPS_SINGLE = ['单', '1B'];
@@ -71,80 +63,6 @@
     const stopBtn = document.getElementById('stopBtn');
     
     stopBtn.disabled = true;
-
-    // 替换原有的语音识别初始化代码
-    let xfRecognition;
-
-    function initSpeechRecognition() {
-        try {
-            // 检查SDK是否确加载
-            if (typeof WebIAT === 'undefined') {
-                throw new Error('讯飞SDK未能正确加载，请检查网络连接');
-            }
-
-            // 配置讯飞语音识别
-            const config = {
-                // 使用您的讯飞开放平台应用凭证
-                "appid": "4da6c04e",
-                "api_key": "d5d0e4e16e49e9750206c787d974146b",
-                "api_secret": "ZTYxN2Y4ZDNmNjM0ZWY2YzUxZTdkYTMw",
-                // 设置参数
-                "accent": "mandarin", // 设置普通话
-                "sample_rate": "16000", // 采样率16k
-                "vad_eos": "1000", // 后端点检测时间1秒
-                "enable_punctuation": true, // 开启标点符号
-                "enable_intermediate_result": true, // 开启中间结果返回
-                "language": "zh_cn" // 设置语言为中文
-            };
-
-            xfRecognition = new WebIAT(config);
-
-            // 添加连接状态监听
-            xfRecognition.onOpen = function() {
-                console.log('语音识别连接已立');
-            };
-
-            xfRecognition.onClose = function() {
-                console.log('语音识别连接已关闭');
-            };
-
-            // 监听识别结果
-            xfRecognition.onResult = function(result) {
-                try {
-                    if (result && result.data) {
-                        // 解析JSON结果
-                        const resultData = JSON.parse(result.data);
-                        if (resultData.result) {
-                            const transcript = resultData.result.text;
-                            console.log('识别到的语音:', transcript);
-                            
-                            // 检查是否包含"停"字
-                            if (transcript.includes('停')) {
-                                console.log('检测到停止命令');
-                                stopBtn.click();
-                            }
-                        }
-                    }
-                } catch (error) {
-                    console.error('解析识别结果时出错:', error);
-                }
-            };
-
-            // 监听错误
-            xfRecognition.onError = function(error) {
-                console.error('语音识别错误:', error);
-                // 发错时尝试重新初始化
-                setTimeout(initSpeechRecognition, 3000);
-            };
-
-            console.log('语音识别初始化成功');
-        } catch (error) {
-            console.error('初始化语音识别时发生错误:', error);
-        }
-    }
-
-    // 初始化语音识别
-    initSpeechRecognition();
 
     function reportLeftNumber() {
         console.log('现在剩多少条问题？', 
@@ -187,7 +105,7 @@
         }
     }
     
-    // 添加一个状态变量来跟踪当前���单声部还是多声部
+    // 添加一个状态变量来跟踪当前单声部还是多声部
     let currentMode = 'single'; // 'single' 或 'multiple'
 
     // 在 script 标签开始处添加新的状态变量
@@ -227,20 +145,6 @@
             modeHintElement.textContent = '请两位一起抽多声部题目';
         }
         
-        // 启动讯飞语音识别
-        if (xfRecognition) {
-            try {
-                await xfRecognition.start();
-                console.log('语音识别已启动');
-            } catch (error) {
-                console.error('启动语音识别失败:', error);
-                initSpeechRecognition();
-            }
-        } else {
-            console.warn('语音识别未初始化，正在重新初始化...');
-            initSpeechRecognition();
-        }
-
         await playAudio();
 
         // 添加动画类
@@ -263,7 +167,7 @@
             if (currentRound === 2 && roundResults.playerA) {
                 // 获取可用的题目（排除Player A已抽到的题目）
                 let availableQuestions = questions[currentGroupName].filter(q => {
-                    // 如果是同一组别，需要排除Player A的题目
+                    // 如果是同一组别，需���排除Player A的题目
                     if (currentGroupName === roundResults.playerA.group) {
                         return q !== roundResults.playerA.question;
                     }
@@ -303,10 +207,6 @@
     // 修改 stopBtn 的点击事件处理
     stopBtn.addEventListener('click', () => {
         clearInterval(interval);
-
-        if (xfRecognition) {
-            xfRecognition.stop();
-        }
 
         stopAudio();
 
@@ -394,15 +294,7 @@
     resetBtn.addEventListener('click', () => {
         clearInterval(interval);
         
-        if (xfRecognition) {
-            try {
-                xfRecognition.stop();
-                console.log('语音识别已停止');
-            } catch (error) {
-                console.error('停止语音识别失败:', error);
-            }
-        }
-
+        // 停止音频播放
         stopAudio();
         
         timer = INIT_COUNT_DOWN;
@@ -421,7 +313,7 @@
         singleResultA.textContent = '';
         singleResultB.textContent = '';
         duetResult.textContent = '';
-        singleResult.classList.remove('fade-in');
+        singleResultA.classList.remove('fade-in');
         singleResultB.classList.remove('fade-in');
         duetResult.classList.remove('fade-in');
 
@@ -437,7 +329,7 @@
         
         modeHintElement.textContent = '请Player A抽单声部题目';
 
-        // 移除动画��
+        // 移除动画类
         document.body.classList.remove('countdown-active');
         timerElement.classList.remove('timer-active');
         groupElement.classList.remove('text-active');
